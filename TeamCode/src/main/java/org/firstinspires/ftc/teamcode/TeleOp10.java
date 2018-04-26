@@ -1,15 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Hardware;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.teamcode.actuators.*;
 
 
@@ -17,16 +11,15 @@ import org.firstinspires.ftc.teamcode.actuators.*;
 public class TeleOp10 extends LinearOpMode {
 
     static DriveTrain wheels;
-    static ServoControl leftArm, rightArm;
+    static ServoControl leftServer, rightServer;
+    static MotorControl intakeLeft, intakeRight, liftLeft, liftRight;
     static Controller gamepad;
     static ElapsedTime runtime;
 
     public void initialize() {
 
         //底盘--四个车轮
-        wheels = new DriveTrain(hardwareMap.dcMotor.get("front_left_drive"),
-                                hardwareMap.dcMotor.get("front_right_drive"),
-                                hardwareMap.dcMotor.get("back_left_drive"),
+        wheels = new DriveTrain(hardwareMap.dcMotor.get("back_left_drive"),
                                 hardwareMap.dcMotor.get("back_right_drive"));
 
         //普通轮
@@ -39,24 +32,26 @@ public class TeleOp10 extends LinearOpMode {
          */
 
         //左右两个servo手臂(好像你写的就是这个东西...)
-        leftArm = new ServoControl(hardwareMap.servo.get("arm_left"),true,-1, 1);
-        rightArm = new ServoControl(hardwareMap.servo.get("arm_left"),false,-1,1);
+        leftServer = new ServoControl(hardwareMap.servo.get("server_left"),true,-1, 1);
+        rightServer = new ServoControl(hardwareMap.servo.get("server_right"),false,-1,1);
 
+        intakeLeft = new MotorControl(hardwareMap.dcMotor.get("intake_left"),false);
+        intakeRight = new MotorControl(hardwareMap.dcMotor.get("intake_right"),true);
+        liftLeft = new MotorControl(hardwareMap.dcMotor.get("lift_left"),false);
+        liftRight = new MotorControl(hardwareMap.dcMotor.get("lift_right"),true);
         //计时器 -- FTC官方也用这个
         runtime = new ElapsedTime();
 
         //手柄控制框架 -- 把FTC的gamepad1
-        Controller gamepad = new Controller(gamepad1);
+        gamepad = new Controller(gamepad1);
     }
 
     public void outputData() {
 
         //轮胎信息
-        telemetry.addData("LF Wheel Power", wheels.getSpeed(DriveTrain.Wheels.FRONT_LEFT));
-        telemetry.addData("RF Wheel Power", wheels.getSpeed(DriveTrain.Wheels.FRONT_RIGHT));
-        telemetry.addData("LB Wheel Power", wheels.getSpeed(DriveTrain.Wheels.REAR_LEFT));
-        telemetry.addData("RB Wheel Power", wheels.getSpeed(DriveTrain.Wheels.REAR_RIGHT));
-
+        telemetry.addData("Wheel Power", wheels.getSpeed(DriveTrain.Wheels.REAR_LEFT) + ", " + wheels.getSpeed(DriveTrain.Wheels.REAR_RIGHT));
+        telemetry.addData("Lift Power", liftLeft.getPower() + ", " + liftRight.getPower());
+        telemetry.addData("Intake Power", intakeLeft.getPower() + ", " + intakeRight.getPower());
         //输出到Driver Station
         telemetry.update();
     }
@@ -85,11 +80,20 @@ public class TeleOp10 extends LinearOpMode {
             }
 
 
-            //手臂
-            if(gamepad.isKeysChanged(Controller.dPadLeft, Controller.dPadRight)) {
-                leftArm.moveWithButton(gamepad.isKeyHeld(Controller.dPadLeft));
-                rightArm.moveWithButton(gamepad.isKeyHeld(Controller.dPadLeft));
+            //伺服 (A键收回，B键放出）
+            if(gamepad.isKeysChanged(Controller.A, Controller.B)) {
+                leftServer.moveWithButton(gamepad.isKeyHeld(Controller.A));
+                rightServer.moveWithButton(gamepad.isKeyHeld(Controller.A));
             }
+
+            //升降，方向键上下控制
+                liftLeft.moveWithButton(gamepad.isKeyHeld(Controller.dPadUp),gamepad.isKeyHeld(Controller.dPadDown));
+                liftLeft.moveWithButton(gamepad.isKeyHeld(Controller.dPadUp),gamepad.isKeyHeld(Controller.dPadDown));
+
+            //吸入方块，X,Y控制
+                intakeLeft.moveWithButton(gamepad.isKeyHeld(Controller.X),gamepad.isKeyHeld(Controller.Y));
+                intakeRight.moveWithButton(gamepad.isKeyHeld(Controller.X),gamepad.isKeyHeld(Controller.Y));
+
 
             //输出信息
             outputData();
