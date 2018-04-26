@@ -29,13 +29,13 @@ public class TeleOp10 extends LinearOpMode {
                                 hardwareMap.dcMotor.get("back_left_drive"),
                                 hardwareMap.dcMotor.get("back_right_drive"));
 
-        //全向轮(我记得你们是)
-        wheels.setWheelMode(DriveTrain.WheelMode.OMNI_WHEEL);
+        //普通轮
+        wheels.setWheelMode(DriveTrain.WheelMode.TANK_WHEEL);
 
         /**
          * 或者你们也可以...
          * wheels.setWheelMode(DriveTrain.WheelMode.MECANUM_WHEEL); // 麦康纳姆轮（万向轮）
-         * wheels.setWheelMode(DriveTrain.WheelMode.TANK_WHEEL); //普通轮
+         * wheels.setWheelMode(DriveTrain.WheelMode.OMNI_WHEEL); //全向轮
          */
 
         //左右两个servo手臂(好像你写的就是这个东西...)
@@ -76,12 +76,12 @@ public class TeleOp10 extends LinearOpMode {
             //获取手柄信息
             gamepad.updateStatus();
 
-            //左摇杆控制前后左右平移（还可以对角移), 右摇杆左右控制旋转
-            if(gamepad.isKeysChanged(Controller.jLeftX, Controller.jLeftY, Controller.jRightX)) {
+            //RT和LT控制油门和刹车，左摇杆控制旋转
+            if(gamepad.isKeysChanged(Controller.RT, Controller.LT, Controller.jLeftX)) {
 
-                wheels.omniDrive(gamepad.getValue(Controller.jLeftX),
-                                -gamepad.getValue(Controller.jLeftY),
-                                gamepad.getValue(Controller.jRightX));
+                wheels.drive(0,
+                                gamepad.getValue(Controller.RT) - gamepad.getValue(Controller.LT),
+                                gamepad.getValue(Controller.jLeftX));
             }
 
 
