@@ -31,7 +31,7 @@ public class TeleOp10 extends LinearOpMode {
          * wheels.setWheelMode(DriveTrain.WheelMode.OMNI_WHEEL); //全向轮
          */
 
-        //左右两个servo手臂(好像你写的就是这个东西...)
+        //左右两个servo丢方块(好像你写的就是这个东西...)
         leftServer = new ServoControl(hardwareMap.servo.get("server_left"),true,-1, 1);
         rightServer = new ServoControl(hardwareMap.servo.get("server_right"),false,-1,1);
 
@@ -49,6 +49,7 @@ public class TeleOp10 extends LinearOpMode {
     public void outputData() {
 
         //轮胎信息
+        telemetry.addData("Runtime: ", runtime.toString());
         telemetry.addData("Wheel Power", wheels.getSpeed(DriveTrain.Wheels.REAR_LEFT) + ", " + wheels.getSpeed(DriveTrain.Wheels.REAR_RIGHT));
         telemetry.addData("Lift Power", liftLeft.getPower() + ", " + liftRight.getPower());
         telemetry.addData("Intake Power", intakeLeft.getPower() + ", " + intakeRight.getPower());
@@ -64,6 +65,9 @@ public class TeleOp10 extends LinearOpMode {
 
         //等用户在手机上按开始键 + 手柄上按PLAY + A键(手柄的两个键要同时按)
         waitForStart();
+
+        //重置计时器
+        runtime.reset();
 
         //循环监测按钮+输出信息
         while(opModeIsActive()) {
