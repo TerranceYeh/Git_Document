@@ -120,11 +120,14 @@ public class ColorSensorOpMode extends LinearOpMode {
 
         while(!opModeIsActive()); //Block Code Execution
 
+        color_sensor.updateColorData();
         //Phase 1
         servo_2.setPosition(0.8);
         sleep(2000);
         servo_1.setPosition(0.7);
         sleep(2000);
+
+        color_sensor.updateColorData();
 
         //Phase 2
         switch(color_sensor.getBallColor()) {
